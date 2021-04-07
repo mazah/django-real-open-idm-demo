@@ -1,4 +1,6 @@
 # django-real-open-idm-demo
+![Preview](img/demo.png)
+
 
 # Getting started
 
@@ -11,7 +13,6 @@ python3
 1. Install requirements
 
 ```
-
 pip install -r requirements.txt
 
 ```
@@ -20,11 +21,9 @@ pip install -r requirements.txt
 
 ```
 # run in folder with manage.py
-
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
-
 
 ```
 
@@ -42,7 +41,6 @@ python manage.py loaddata */fixtures/*.json
 
 ```
 # run in folder with manage.py
-
 python manage.py runserver
 
 ```
