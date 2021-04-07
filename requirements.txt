@@ -1,0 +1,6 @@
+Django==3.2
+django-river==3.3.0
+six
+django-codemirror2
+ldap3
+river-admin
