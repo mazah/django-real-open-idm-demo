@@ -1,4 +1,5 @@
 # django-real-open-idm-demo
+[![Build Status](https://travis-ci.com/markusleh/django-real-open-idm-demo.svg?branch=main)](https://travis-ci.com/markusleh/django-real-open-idm-demo)
 ![Preview](img/demo.png)
 
 
