@@ -1,5 +1,6 @@
 # django-real-open-idm-demo
-[![Build Status](https://travis-ci.com/markusleh/django-real-open-idm-demo.svg?branch=main)](https://travis-ci.com/markusleh/django-real-open-idm-demo)
+[![Build Status](https://travis-ci.com/markusleh/django-real-open-idm-demo.svg?branch=main)](https://travis-ci.com/markusleh/django-real-open-idm-demo) ![CodeQL](https://github.com/markusleh/django-real-open-idm-demo/workflows/CodeQL/badge.svg)
+
 ![Preview](img/demo.png)
 
 
