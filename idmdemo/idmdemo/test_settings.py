@@ -16,6 +16,7 @@ BASE_DIR = os.environ.get('TRAVIS_BUILD_DIR')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'djagorealidm/db.sqlite3'),
+        'TEST_NAME': os.path.join(BASE_DIR, 'djagorealidm/db.sqlite3'),
     }
 }
