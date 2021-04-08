@@ -1,6 +1,7 @@
 from ldap3 import Server, Connection, ALL, NTLM, Reader, ObjectDef, SUBTREE
 from ldap3.extend.microsoft.addMembersToGroups import ad_add_members_to_groups as addUsersInGroups
 from ldap3.extend.microsoft.removeMembersFromGroups import ad_remove_members_from_groups as removeUsersInGroups
+from django.conf import settings
 
 """
         person = ObjectDef('inetOrgPerson')
@@ -26,7 +27,11 @@ from ldap3.extend.microsoft.removeMembersFromGroups import ad_remove_members_fro
 ldap_user_attribute = "sAMAccountName"
 
 class Sync(object):
-    def __init__(self, uri, dn, password):
+    def __init__(self):
+        uri = settings.REAL_IDM["LDAP_SERVER"]
+        dn = settings.REAL_IDM.get("BIND_USER")
+        password = settings.REAL_IDM.get("BIND_PASSWD")
+        self.search_base = settings.REAL_IDM["SEARCH_BASE"]
         self.conn = self.ldap_begin(uri, dn, password)
 
     def ldap_begin(self, uri, dn=None, password=None, port=389, use_ssl=False):
@@ -36,7 +41,7 @@ class Sync(object):
 
     def find_userdn_by_username(self, username):
         self.conn.search(
-            search_base="dc=win,dc=local",
+            search_base=self.search_base,
             search_filter="({}={})".format(ldap_user_attribute, username),
             search_scope=SUBTREE,
             attributes=[ldap_user_attribute]
@@ -62,7 +67,7 @@ class Sync(object):
     def sync_users_single_group(self, users, groupDn):
         # (&(objectCategory=user)(memberOf={}))
         self.conn.search(
-            search_base="dc=win,dc=local",
+            search_base=self.search_base,
             search_filter="(&(objectCategory=user)(memberOf={}))".format(groupDn),
             search_scope=SUBTREE,
             attributes=[ldap_user_attribute]
@@ -81,7 +86,7 @@ class Sync(object):
     def sync_users_groups(self, users, groups=[]):
         for group in groups:
             self.conn.search(
-                search_base="dc=win,dc=local",
+                search_base=self.search_base,
                 search_filter="(&(objectClass=group)(cn={}))".format(group),
                 search_scope=SUBTREE,
             )

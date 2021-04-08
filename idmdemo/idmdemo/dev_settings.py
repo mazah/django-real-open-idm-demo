@@ -15,6 +15,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR +  'db.sqlite3',
+        'NAME': Path.joinpath(BASE_DIR, 'db.sqlite3'),
     }
+}
+
+REAL_IDM = {
+    'LDAP_SERVER': "",      # required, server address e.g. '192.168.1.1'
+    'SEARCH_BASE': "",       # required, where the groups and users are located e.g. 'dc=win,dc=local'
+    'BIND_USER': "",        # optional, bind user e.g. bind@win.local
+    'BIND_PASSWD': ""       # optional
 }

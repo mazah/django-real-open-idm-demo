@@ -131,6 +131,9 @@ elif os.environ.get('ENVIRONMENT') == "TEST":
 elif os.environ.get('ENVIRONMENT') == "HEROKU":
     print("Running on HEROKU Environment settings")
     from .heroku_settings import *
+elif os.environ.get('ENVIRONMENT') == "LOCAL":
+    print("Running on LOCAL Environment settings")
+    from .local_settings import *
 else:
     from .dev_settings import *
     print("Running on  Local Environment settings")

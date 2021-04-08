@@ -56,3 +56,37 @@ python manage.py runserver
 1. Go to `http://localhost:8000/admin/auth/user/` and add your account (which you created using `createsuperuser` to django existing group `approver`
 
 2. Navigate to `http://localhost:8000/admin/djangorealidm/grant/` and try to create a new grant.
+
+# Utils
+
+## AD: Sync approved Group membership to Active Directory
+
+Example
+
+Create new function in the admin-ui e.g. `function name: sync-ad`
+```
+from djangorealidm.utils import Sync
+from djangorealidm.models import Group, User, Grant
+from river.models import State
+
+def handle(context):
+  s = Sync()
+  approved_status = status=State.objects.get(slug="approved")
+  groups = [group.name for group in Group.objects.all()]
+  for group in groups:
+  	users = [grant.user.username for grant in Grant.objects.filter(status=approved_status, group__name=group)]
+ 
+  	s.sync_users_groups(users, [group])
+```
+
+Add LDAP configuration parameters in `settings.py`
+```
+REAL_IDM = {
+    'LDAP_SERVER': "",      # required, server address e.g. '192.168.1.1'
+    'SEARCH_BASE': "",       # required, where the groups and users are located e.g. 'dc=win,dc=local'
+    'BIND_USER': "",        # optional, bind user e.g. bind@win.local
+    'BIND_PASSWD': ""       # optional
+}
+```
+Create a new `On-approved hook` to sync group membership status after new approvals have been made and attach it to your workflow.
+![Preview](img/function-example.png)
