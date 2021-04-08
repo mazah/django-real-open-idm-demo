@@ -12,6 +12,7 @@ from river.models import State
 admin.site.register(Group)
 admin.site.register(User)
 
+
 class ApprovalRequiredListFilter(admin.SimpleListFilter):
     # Human-readable title which will be displayed in the
     # right admin sidebar just above the filter options.
@@ -55,10 +56,12 @@ def create_river_button(obj, transition_approval):
         />
     """
 
+
 @admin.action(description='Approve selected grants')
 def approve_grants(modeladmin, request, queryset):
     for obj in queryset:
         obj.river.status.approve(as_user=request.user, next_state=State.objects.get(slug="approved"))
+
 
 @admin.action(description='Disable selected grants')
 def disable_grants(modeladmin, request, queryset):

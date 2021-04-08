@@ -4,3 +4,7 @@ six
 django-codemirror2
 ldap3
 river-admin
+gunicorn
+django-heroku
+dj_database_url
+psycopg2

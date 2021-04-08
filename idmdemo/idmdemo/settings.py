@@ -128,6 +128,9 @@ if os.environ.get('ENVIRONMENT') == "PROD":
 elif os.environ.get('ENVIRONMENT') == "TEST":
     print("Running on Test Environment settings")
     from .test_settings import *
+elif os.environ.get('ENVIRONMENT') == "HEROKU":
+    print("Running on HEROKU Environment settings")
+    from .heroku_settings import *
 else:
     from .local_settings import *
     print("Running on  Local Environment settings")
