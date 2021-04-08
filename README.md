@@ -8,7 +8,8 @@
 
 ## Prerequisites
 
-python3
+- python3.6 or newer
+- Latest Ubuntu preferred. Tested with Ubuntu 20.04
 
 ## Install
 
