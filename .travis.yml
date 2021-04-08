@@ -18,6 +18,7 @@ before_script:
   - cd idmdemo
   - python manage.py migrate --fake river zero
   - python manage.py migrate --fake river
+  - python manage.py makemigrations
   - python manage.py migrate
 
 script:
