@@ -2,7 +2,7 @@ from django.test import TestCase
 from .models import User, Group
 
 class SiteTests(TestCase):
-    fixtures = ['djangorealidm']
+    #fixtures = ['djangorealidm']
 
     def testFixtureLoadedUserExists(self):
         s = User.objects.get(pk=1)
