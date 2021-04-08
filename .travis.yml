@@ -1,5 +1,6 @@
 language: python
 cache: pip
+dist: focal
 python:
   - "2.7"
   - "3.4"
@@ -16,10 +17,6 @@ install:
 # command to run tests
 before_script:
   - cd idmdemo
-  - python manage.py migrate --fake river zero
-  - python manage.py migrate --fake river
-  - python manage.py makemigrations
-  - python manage.py migrate
 
 script:
   - python manage.py test
