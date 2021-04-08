@@ -3,6 +3,12 @@
 
 ![Preview](img/demo.png)
 
+# Demo
+https://django-real-idm.herokuapp.com/admin
+
+user: `demo`
+
+password: `demodemo`
 
 # Getting started
 
