@@ -16,5 +16,7 @@ install:
 # command to run tests
 before_script:
   - cd idmdemo
+  - python manage.py migrate --fake river zero
+  - python manage.py migrate --fake river
 script:
   - python manage.py test
