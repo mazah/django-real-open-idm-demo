@@ -125,6 +125,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 if os.environ.get('ENVIRONMENT') == "PROD":
     print("Running on Production Environment settings")
     from .production_settings import *
+elif os.environ.get('ENVIRONMENT') == "TEST":
+    print("Running on Test Environment settings")
+    from .test_settings import *
 else:
     from .local_settings import *
     print("Running on  Local Environment settings")
