@@ -14,7 +14,6 @@ python3
 
 ```
 pip install -r requirements.txt
-
 ```
 
 2. Initiate Django
@@ -24,7 +23,6 @@ pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
-
 ```
 
 3. Load demo data (optional)
@@ -33,7 +31,6 @@ python manage.py createsuperuser
 # run in folder with manage.py
 
 python manage.py loaddata */fixtures/*.json
-
 ```
 
 
@@ -42,7 +39,6 @@ python manage.py loaddata */fixtures/*.json
 ```
 # run in folder with manage.py
 python manage.py runserver
-
 ```
 
 ## Try out
