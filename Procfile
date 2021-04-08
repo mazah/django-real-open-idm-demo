@@ -1,1 +1,1 @@
-web: gunicorn idmdemo.wsgi:application --log-file -
+web: cd idmdemo && gunicorn idmdemo.wsgi:application --log-file -
