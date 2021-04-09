@@ -25,15 +25,23 @@ def approve_ticket(request, grant_id, next_state_id=None):
 def reports(request):
     grant_list = Grant.objects.all()
     template = loader.get_template('djangorealidm/reports.html')
+    grants = []
+    for grant in grant_list:
+        approver = None
+        last_approved = None
+        try:
+            approver = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0].transactioner.username
+            last_approved = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0].transaction_date
+        except:
+            pass
+        grants.append({
+            'approver': approver,
+            'last_approved': last_approved,
+            'grant': grant
+        })
+
     context = {
-        'grant_list': [
-            {
-                'approver': grant.status_transition_approvals.filter(status='approved').order_by('-id')[0].transactioner.username,
-                'last_approved': grant.status_transition_approvals.filter(status='approved').order_by('-id')[0].transaction_date,
-                 'grant': grant
-             }
-            for grant in grant_list
-        ],
+        'grant_list': grants,
     }
     if request.GET.get("csv"):
         response = HttpResponse(content_type='text/csv')
@@ -42,8 +50,14 @@ def reports(request):
         writer = csv.writer(response)
         writer.writerow(['username', 'group', 'status', 'last_approval', 'transaction_date'])
         for grant in grant_list:
-            approval = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0]
-            writer.writerow([grant.user.username, grant.group.name, grant.status.slug, approval.transactioner.username, approval.transaction_date])
+            try:
+                approval = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0]
+                approval_username = approval.transactioner.username
+                last_approved = approval.transaction_date
+            except:
+                approval_username = None
+                last_approved = None
+            writer.writerow([grant.user.username, grant.group.name, grant.status.slug, approval_username, last_approved])
 
         return response
     else:

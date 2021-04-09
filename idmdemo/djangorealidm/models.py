@@ -1,11 +1,13 @@
 from django.db import models
 from river.models.fields.state import StateField
+from django.db.models import Q
 
 # Create your models here.
 
 
 class Group(models.Model):
     name = models.CharField(max_length=256, unique=True)
+    description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
@@ -18,21 +20,38 @@ class User(models.Model):
         return self.username
 
 
+class Role(models.Model):
+    name = models.CharField(max_length=256, unique=True)
+    groups = models.ManyToManyField(Group)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Grant(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, null=True, blank=True)
     status = StateField(on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ("group", "user")
+        unique_together = [["group", "user"], ["role", "user"]]
+        constraints = [
+            models.CheckConstraint(
+                check=Q(group__isnull=False) | Q(role__isnull=False),
+                name='not_both_null'
+            ),
+            models.CheckConstraint(
+                check=Q(group__isnull=True) | Q(role__isnull=True),
+                name='either_null'
+            )
+        ]
 
     def __str__(self):
-        return self.group.name + ", " + self.user.username
+        if self.group:
+            return "g " + self.group.name + ", " + self.user.username
+        else:
+            return "r " + self.role.name + ", " + self.user.username
 
 
-class LDAPSettings(models.Model):
-    uri = models.CharField(max_length=256, unique=True, help_text="LDAP uri including protocol in the form of 'host:port', for example example.com")
-    dn = models.CharField(max_length=256, blank=True)
-    password = models.CharField(max_length=256, blank=True)
-    usersOU = models.CharField(max_length=256)
-    groupsOU = models.CharField(max_length=256)

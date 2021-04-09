@@ -87,6 +87,7 @@ from river.models import State
 
 def handle(context):
   s = Sync()
+  # TODO: Add role sync
   approved_status = status=State.objects.get(slug="approved")
   groups = [group.name for group in Group.objects.all()]
   for group in groups:
@@ -121,3 +122,11 @@ Go to `http://localhost:8000/` for full list of reports available. Currently you
 - Export report to CSV
 
 ![Report-basic](img/reports-basic.png)
+
+ ## Objects
+ 
+ ### Roles
+ Roles are collections of groups which can be assigned to users if needed to ensure similar level of access to multiple users.
+ 
+ 
+ Note: role grants and group grants can exist simultaneously. Always consider that more specific grants should override less specific ones. E.g. `user1` with `disabled` group grant in `group1` should override an approved role grant which contains `group1`. 
