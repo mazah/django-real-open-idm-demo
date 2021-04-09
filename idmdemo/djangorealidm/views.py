@@ -30,8 +30,8 @@ def reports(request):
         approver = None
         last_approved = None
         try:
-            approver = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0].transactioner.username,
-            last_approved = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0].transaction_date,
+            approver = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0].transactioner.username
+            last_approved = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0].transaction_date
         except:
             pass
         grants.append({
