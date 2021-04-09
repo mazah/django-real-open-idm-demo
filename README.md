@@ -95,3 +95,13 @@ REAL_IDM = {
 ```
 Create a new `On-approved hook` to sync group membership status after new approvals have been made and attach it to your workflow.
 ![Preview](img/function-example.png)
+
+# Other features
+## Reports
+
+Go to `http://localhost:8000/` for full list of reports available. Currently you are able to:
+
+- View a basic report about current grants
+- Export report to CSV
+
+![Report-basic](img/reports-basic.png)

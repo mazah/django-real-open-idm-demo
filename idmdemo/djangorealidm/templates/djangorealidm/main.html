@@ -1,0 +1,16 @@
+{% extends 'djangorealidm/base.html' %}
+{% block content %}
+<table class="table" style="width:100%">
+    <thead>
+    <tr>
+        <th>Report</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+    <tr>
+        <td><a href="{% url 'basic-report' %}">Basic report</a></td>
+        <td>Basic report about current status of grants</td>
+    </tr>
+</table>
+{% endblock %}
+
