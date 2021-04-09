@@ -25,15 +25,23 @@ def approve_ticket(request, grant_id, next_state_id=None):
 def reports(request):
     grant_list = Grant.objects.all()
     template = loader.get_template('djangorealidm/reports.html')
+    grants = []
+    for grant in grant_list:
+        approver = None
+        last_approved = None
+        try:
+            approver = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0].transactioner.username,
+            last_approved = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0].transaction_date,
+        except:
+            pass
+        grants.append({
+            'approver': approver,
+            'last_approved': last_approved,
+            'grant': grant
+        })
+
     context = {
-        'grant_list': [
-            {
-                'approver': grant.status_transition_approvals.filter(status='approved').order_by('-id')[0].transactioner.username,
-                'last_approved': grant.status_transition_approvals.filter(status='approved').order_by('-id')[0].transaction_date,
-                 'grant': grant
-             }
-            for grant in grant_list
-        ],
+        'grant_list': grants,
     }
     if request.GET.get("csv"):
         response = HttpResponse(content_type='text/csv')
