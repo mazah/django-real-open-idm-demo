@@ -11,6 +11,7 @@ from river.models import State
 
 admin.site.register(Group)
 admin.site.register(User)
+admin.site.register(Role)
 
 
 class ApprovalRequiredListFilter(admin.SimpleListFilter):
@@ -71,9 +72,9 @@ def disable_grants(modeladmin, request, queryset):
 
 @admin.register(Grant)
 class UserGrantAdmin(admin.ModelAdmin):
-    list_display = ("id", "group", "user", "status", "approval_actions")
+    list_display = ("id", "group", "role", "user", "status", "approval_actions")
     list_filter = (ApprovalRequiredListFilter,"group")
-    search_fields = ['user__username', "group__name"]
+    search_fields = ['user__username', "group__name", "role__name"]
     actions = [approve_grants, disable_grants]
 
     def get_list_display(self, request):
