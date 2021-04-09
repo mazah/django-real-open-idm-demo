@@ -30,6 +30,7 @@ pip install -r requirements/dev.txt
 ```
 # run in folder with manage.py
 python manage.py makemigrations
+python manage.py makemigrations djangorealidm
 python manage.py migrate
 python manage.py createsuperuser
 ```
