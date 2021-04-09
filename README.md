@@ -64,7 +64,7 @@ python manage.py runserver
 Example
 
 Create new function in the admin-ui e.g. `function name: sync-ad`
-```
+```python
 from djangorealidm.utils import Sync
 from djangorealidm.models import Group, User, Grant
 from river.models import State
@@ -74,7 +74,11 @@ def handle(context):
   approved_status = status=State.objects.get(slug="approved")
   groups = [group.name for group in Group.objects.all()]
   for group in groups:
-  	users = [grant.user.username for grant in Grant.objects.filter(status=approved_status, group__name=group)]
+  	users = [grant.user.username for grant in Grant.objects.filter(
+  	    status=approved_status, 
+  	    group__name=group,
+  	    status_transition_approvals__isnull=False # Retrieve grants for which approval has been explicitly granted. Prevents creating grant objects with 'approved' status
+  	    )]
  
   	s.sync_users_groups(users, [group])
 ```
@@ -82,10 +86,11 @@ def handle(context):
 Add LDAP configuration parameters in `settings.py`
 ```
 REAL_IDM = {
-    'LDAP_SERVER': "",      # required, server address e.g. '192.168.1.1'
-    'SEARCH_BASE': "",       # required, where the groups and users are located e.g. 'dc=win,dc=local'
-    'BIND_USER': "",        # optional, bind user e.g. bind@win.local
-    'BIND_PASSWD': ""       # optional
+    'LDAP_SERVER': "",          # required, server address e.g. '192.168.1.1'
+    'SEARCH_BASE': "",          # required, where the groups and users are located e.g. 'dc=win,dc=local'
+    'BIND_USER': "",            # optional, bind user e.g. bind@win.local
+    'BIND_PASSWD': "",          # optional
+    'LDAP_USER_ATTRIBUTE': ""   # optional, mapping for User.username and AD attribute name used to search the user from AD. Defaults to 'sAMAccountName'
 }
 ```
 Create a new `On-approved hook` to sync group membership status after new approvals have been made and attach it to your workflow.
