@@ -20,8 +20,9 @@ DATABASES = {
 }
 
 REAL_IDM = {
-    'LDAP_SERVER': "",      # required, server address e.g. '192.168.1.1'
-    'SEARCH_BASE': "",       # required, where the groups and users are located e.g. 'dc=win,dc=local'
-    'BIND_USER': "",        # optional, bind user e.g. bind@win.local
-    'BIND_PASSWD': ""       # optional
+    'LDAP_SERVER': "",          # required, server address e.g. '192.168.1.1'
+    'SEARCH_BASE': "",          # required, where the groups and users are located e.g. 'dc=win,dc=local'
+    'BIND_USER': "",            # optional, bind user e.g. bind@win.local
+    'BIND_PASSWD': "",          # optional
+    'LDAP_USER_ATTRIBUTE': ""   # optional, mapping for User.username and AD attribute name used to search the user from AD. Defaults to 'sAMAccountName'
 }

@@ -3,34 +3,13 @@ from ldap3.extend.microsoft.addMembersToGroups import ad_add_members_to_groups a
 from ldap3.extend.microsoft.removeMembersFromGroups import ad_remove_members_from_groups as removeUsersInGroups
 from django.conf import settings
 
-"""
-        person = ObjectDef('inetOrgPerson')
-        self.conn.search(
-            search_base="dc=win,dc=local",
-            search_filter="(sAMAccountName={})".format(username),
-            search_scope=SUBTREE,
-            attributes=['objectsid', 'sAMAccountName']
-        )
-        try:
-            userDn = self.conn.response[0]["dn"]
-        except Exception as e:
-            print(e)
-            return
-        print(userDn)
-        addUsersInGroups(self.conn, userDn, groupDn, raise_error=True)
-
-        # "(&(sAMAccountName=bsmith))"
-        #Reader(self.conn, person, '(&(member=CN=myuser_in_full_name,OU=xxx,OU=xxxxxx,DC=mydomain,DC=com)(objectClass=group))', 'dc=mydomain,dc=com').search()
-"""
-
-
-ldap_user_attribute = "sAMAccountName"
 
 class Sync(object):
     def __init__(self):
         uri = settings.REAL_IDM["LDAP_SERVER"]
         dn = settings.REAL_IDM.get("BIND_USER")
         password = settings.REAL_IDM.get("BIND_PASSWD")
+        self.ldap_user_attr = settings.REAL_IDM.get("LDAP_USER_ATTRIBUTE", "sAMAccountName")
         self.search_base = settings.REAL_IDM["SEARCH_BASE"]
         self.conn = self.ldap_begin(uri, dn, password)
 
@@ -42,9 +21,9 @@ class Sync(object):
     def find_userdn_by_username(self, username):
         self.conn.search(
             search_base=self.search_base,
-            search_filter="({}={})".format(ldap_user_attribute, username),
+            search_filter="({}={})".format(self.ldap_user_attr, username),
             search_scope=SUBTREE,
-            attributes=[ldap_user_attribute]
+            attributes=[self.ldap_user_attr]
         )
         try:
             userDn = self.conn.response[0]["dn"]
@@ -65,14 +44,13 @@ class Sync(object):
         removeUsersInGroups(self.conn, userDn, groupDn, fix=True, raise_error=True)
 
     def sync_users_single_group(self, users, groupDn):
-        # (&(objectCategory=user)(memberOf={}))
         self.conn.search(
             search_base=self.search_base,
             search_filter="(&(objectCategory=user)(memberOf={}))".format(groupDn),
             search_scope=SUBTREE,
-            attributes=[ldap_user_attribute]
+            attributes=[self.ldap_user_attr]
         )
-        users_in_group = [str(user[ldap_user_attribute]) for user in self.conn.entries]
+        users_in_group = [str(user[self.ldap_user_attr]) for user in self.conn.entries]
         print("Users in group: '{}': {}".format(groupDn, users_in_group))
         for user in users:
             if user not in users_in_group:
@@ -81,7 +59,6 @@ class Sync(object):
         group_diff = list(set(users_in_group) - set(users)) # Users in LDAP group that shouldn't be
         for user in group_diff:
             self.remove_user_from_group(user, groupDn)
-
 
     def sync_users_groups(self, users, groups=[]):
         for group in groups:
