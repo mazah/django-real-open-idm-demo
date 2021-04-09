@@ -50,8 +50,14 @@ def reports(request):
         writer = csv.writer(response)
         writer.writerow(['username', 'group', 'status', 'last_approval', 'transaction_date'])
         for grant in grant_list:
-            approval = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0]
-            writer.writerow([grant.user.username, grant.group.name, grant.status.slug, approval.transactioner.username, approval.transaction_date])
+            try:
+                approval = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0]
+                approval_username = approval.transactioner.username
+                last_approved = approval.transaction_date
+            except:
+                approval_username = None
+                last_approved = None
+            writer.writerow([grant.user.username, grant.group.name, grant.status.slug, approval_username, last_approved])
 
         return response
     else:
