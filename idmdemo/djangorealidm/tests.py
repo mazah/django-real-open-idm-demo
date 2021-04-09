@@ -4,7 +4,7 @@ from river.models import State
 import django.contrib.auth.models as authModels
 
 class SiteTests(TestCase):
-    fixtures = ['djangorealidm']
+    fixtures = ['newfixtures']
 
     def setUp(self):
         self.testUser = authModels.User.objects.create(username="testuser")
@@ -28,4 +28,5 @@ class SiteTests(TestCase):
 
     def testGrantNeedsApproval(self):
         approvals = Grant.river.status.get_available_approvals(as_user=self.testUser)
+        print(approvals)
         self.assertEqual(approvals[0].groups.all()[0], self.approver_group)
