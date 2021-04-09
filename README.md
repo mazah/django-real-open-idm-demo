@@ -60,7 +60,7 @@ python manage.py runserver
 3. Initiate Django
 ```
 docker exec django-real-open-idm-demo_djangorealopenidmdemo_1 python manage.py makemigrations
-docker exec django-real-open-idm-demo_djangorealopenidmdemo_1 python manage.py makemigrations
+docker exec django-real-open-idm-demo_djangorealopenidmdemo_1 python manage.py makemigrations djangorealidm
 docker exec django-real-open-idm-demo_djangorealopenidmdemo_1 python manage.py migrate
 docker exec -it django-real-open-idm-demo_djangorealopenidmdemo_1 python manage.py createsuperuser
 ```
