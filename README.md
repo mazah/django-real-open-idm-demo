@@ -51,6 +51,21 @@ python manage.py loaddata */fixtures/*.json
 python manage.py runserver
 ```
 
+## Docker Install
+
+1. install docker-compose
+
+2. Run docker-compose build
+
+3. Initiate Django
+```
+docker exec django-real-open-idm-demo_djangorealopenidmdemo_1 python manage.py makemigrations
+docker exec django-real-open-idm-demo_djangorealopenidmdemo_1 python manage.py makemigrations djangorealidm
+docker exec django-real-open-idm-demo_djangorealopenidmdemo_1 python manage.py migrate
+docker exec -it django-real-open-idm-demo_djangorealopenidmdemo_1 python manage.py createsuperuser
+```
+4. docker-compose up -d
+
 ## Try out
 
 

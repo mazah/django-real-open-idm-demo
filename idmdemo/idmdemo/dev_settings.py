@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': Path.joinpath(BASE_DIR, 'db.sqlite3'),
+        'NAME': Path.joinpath(BASE_DIR, "db", 'db.sqlite3'),
     }
 }
 
