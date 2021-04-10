@@ -91,11 +91,14 @@ def handle(context):
   approved_status = status=State.objects.get(slug="approved")
   groups = [group.name for group in Group.objects.all()]
   for group in groups:
-  	users = [grant.user.username for grant in Grant.objects.filter(
+    users = []
+    for grant in Grant.objects.filter(
   	    status=approved_status, 
   	    group__name=group,
   	    status_transition_approvals__isnull=False # Retrieve grants for which approval has been explicitly granted. Prevents creating grant objects with 'approved' status
-  	    )]
+  	    ):
+  	    if grant.is_valid:
+  	        users.append(grant.user.username)
  
   	s.sync_users_groups(users, [group])
 ```

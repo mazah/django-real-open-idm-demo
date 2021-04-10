@@ -6,6 +6,14 @@ from django.urls import reverse
 from django.contrib.auth.models import Permission
 from .views import superuser_or_approver
 from django.contrib.auth.hashers import make_password
+from django.utils import timezone
+import datetime
+from .utils import check_grant_in_effect
+import random
+
+def random_name():
+    return random.randint(1,10000000)
+
 
 class IdmTests(TestCase):
     fixtures = ['newfixtures']
@@ -19,6 +27,7 @@ class IdmTests(TestCase):
         self.state1 = State.objects.get(slug="needs-approval")
         self.user1 = User.objects.get(pk=1)
         self.group1 = Group.objects.get(pk=1)
+        self.group2 = Group.objects.get(pk=2)
         self.grant1 = Grant.objects.create(group_id=self.group1.id, user_id=self.user1.id, status=self.state1)
 
 class SiteTests(TestCase):
@@ -91,3 +100,50 @@ class ReportHistoryViewTests(IdmTests):
         self.assertTrue(self.client.login(username='testuser', password="password"))
         response = self.client.get(reverse('basic-report'), data={"csv": True})
         self.assertContains(response, "user1")
+
+class UtilsTests(IdmTests):
+    def test_grant_in_effect_not_before_fails(self):
+        now = timezone.now()
+        not_before = now + datetime.timedelta(hours=1)
+        grant = Grant.objects.create(
+            group_id=self.group2.id,
+            user_id=self.user1.id,
+            status=self.state1,
+            not_valid_before=not_before)
+        self.assertEquals(check_grant_in_effect(grant), False)
+
+    def test_grant_in_effect_not_before_succeeds(self):
+        now = timezone.now()
+        not_before = now - datetime.timedelta(hours=1)
+        grant = Grant.objects.create(
+            group=Group.objects.create(name="yetanothergroup"),
+            user_id=self.user1.id,
+            status=self.state1,
+            not_valid_before=not_before)
+        self.assertEquals(check_grant_in_effect(grant), True)
+
+    def test_grant_in_effect_not_after_fails(self):
+        now = timezone.now()
+        not_before = now - datetime.timedelta(hours=1)
+        not_after = now - datetime.timedelta(minutes=1)
+        grant = Grant.objects.create(
+            group=Group.objects.create(name="group{}".format(random_name())),
+            user_id=self.user1.id,
+            status=self.state1,
+            not_valid_before=not_before,
+            not_valid_after=not_after
+        )
+        self.assertEquals(check_grant_in_effect(grant), False)
+
+    def test_grant_in_effect_not_after_succeeds(self):
+        now = timezone.now()
+        not_before = now - datetime.timedelta(hours=1)
+        not_after = now + datetime.timedelta(minutes=1)
+        grant = Grant.objects.create(
+            group=Group.objects.create(name="group{}".format(random_name())),
+            user_id=self.user1.id,
+            status=self.state1,
+            not_valid_before=not_before,
+            not_valid_after=not_after
+        )
+        self.assertEquals(check_grant_in_effect(grant), True)

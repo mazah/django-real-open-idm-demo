@@ -2,7 +2,7 @@ from django.db import models
 from river.models.fields.state import StateField
 from django.db.models import Q
 from django.utils import timezone
-
+from .utils import check_grant_in_effect
 
 # Create your models here.
 
@@ -38,6 +38,10 @@ class Grant(models.Model):
     status = StateField(on_delete=models.CASCADE)
     not_valid_before = models.DateTimeField(default=timezone.now)
     not_valid_after = models.DateTimeField(blank=True, null=True)
+
+    @property
+    def is_valid(self):
+        return check_grant_in_effect(self)
 
     class Meta:
         unique_together = [["group", "user"], ["role", "user"]]

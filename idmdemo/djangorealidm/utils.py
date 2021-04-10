@@ -2,6 +2,14 @@ from ldap3 import Server, Connection, ALL, NTLM, Reader, ObjectDef, SUBTREE
 from ldap3.extend.microsoft.addMembersToGroups import ad_add_members_to_groups as addUsersInGroups
 from ldap3.extend.microsoft.removeMembersFromGroups import ad_remove_members_from_groups as removeUsersInGroups
 from django.conf import settings
+from django.utils import timezone
+
+
+def check_grant_in_effect(grant_obj):
+    if grant_obj.not_valid_before and grant_obj.not_valid_after:
+        return grant_obj.not_valid_before <= timezone.now() <= grant_obj.not_valid_after
+    else:
+        return grant_obj.not_valid_before <= timezone.now()
 
 
 class Sync(object):
