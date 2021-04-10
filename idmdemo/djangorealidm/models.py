@@ -1,6 +1,8 @@
 from django.db import models
 from river.models.fields.state import StateField
 from django.db.models import Q
+from django.utils import timezone
+
 
 # Create your models here.
 
@@ -34,6 +36,8 @@ class Grant(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.ForeignKey(Role, on_delete=models.CASCADE, null=True, blank=True)
     status = StateField(on_delete=models.CASCADE)
+    not_valid_before = models.DateTimeField(default=timezone.now)
+    not_valid_after = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         unique_together = [["group", "user"], ["role", "user"]]
