@@ -5,9 +5,13 @@ from django.shortcuts import get_object_or_404, redirect
 from djangorealidm.models import Grant
 from river.models import State, TransitionApproval
 from django.template import loader
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.contenttypes.models import ContentType
 import csv
+
+
+def superuser_or_approver(user):
+    return user.is_superuser or user.groups.filter(name='approver').exists()
 
 
 @login_required(login_url='/admin/login/')
@@ -22,7 +26,7 @@ def approve_ticket(request, grant_id, next_state_id=None):
         return HttpResponse(e.message)
 
 
-@login_required(login_url='/admin/login/')
+@user_passes_test(superuser_or_approver, login_url="/admin/login")
 def reports(request):
     grant_list = Grant.objects.all()
     template = loader.get_template('djangorealidm/reports.html')
@@ -65,7 +69,7 @@ def reports(request):
         return HttpResponse(template.render(context, request))
 
 
-@login_required(login_url='/admin/login/')
+@user_passes_test(superuser_or_approver, login_url="/admin/login")
 def grant_history(request):
     template = loader.get_template('djangorealidm/grant_history.html')
     approvals = TransitionApproval.objects.filter(content_type=ContentType.objects.get(app_label='djangorealidm', model='grant')).filter(status="approved").order_by("-id")

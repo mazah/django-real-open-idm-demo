@@ -1,7 +1,25 @@
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase
 from .models import User, Group, Grant
 from river.models import State
 import django.contrib.auth.models as authModels
+from django.urls import reverse
+from django.contrib.auth.models import Permission
+from .views import superuser_or_approver
+from django.contrib.auth.hashers import make_password
+
+class IdmTests(TestCase):
+    fixtures = ['newfixtures']
+
+    def setUp(self):
+        self.testUser = authModels.User(username="testuser", password=make_password("password"))
+        self.testUser.is_staff = True
+        self.testUser.save()
+        self.approver_group = authModels.Group.objects.get(name="approver")
+        self.testUser.groups.add(self.approver_group)
+        self.state1 = State.objects.get(slug="needs-approval")
+        self.user1 = User.objects.get(pk=1)
+        self.group1 = Group.objects.get(pk=1)
+        self.grant1 = Grant.objects.create(group_id=self.group1.id, user_id=self.user1.id, status=self.state1)
 
 class SiteTests(TestCase):
     fixtures = ['newfixtures']
@@ -28,5 +46,48 @@ class SiteTests(TestCase):
 
     def testGrantNeedsApproval(self):
         approvals = Grant.river.status.get_available_approvals(as_user=self.testUser)
-        print(approvals)
         self.assertEqual(approvals[0].groups.all()[0], self.approver_group)
+
+
+class ReportIndexViewTests(TestCase):
+    def test_index_no_error(self):
+        response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 200)
+
+
+class ReportHistoryViewTests(IdmTests):
+    def test_report_no_error(self):
+        self.assertTrue(self.client.login(username='testuser', password="password"))
+        response = self.client.get(reverse('history-report'))
+        self.assertTrue(superuser_or_approver(self.testUser))
+        self.assertEqual(response.status_code, 200)
+
+    def test_report_bad_permission(self):
+        anotherTestUser = authModels.User(username="testuser-normal", password=make_password("password"))
+        anotherTestUser.is_staff = True
+        anotherTestUser.save()
+        self.assertTrue(self.client.login(username="testuser-normal", password="password"))
+        response = self.client.get(reverse('history-report'), follow=True)
+        SimpleTestCase.assertRedirects(self, response=response, expected_url="/admin/")
+
+    def test_basic_report_contains_grant(self):
+        self.assertTrue(self.client.login(username='testuser', password="password"))
+        response = self.client.get(reverse('basic-report'))
+        self.assertContains(response, "needs-approval")
+
+    def test_history_report_not_contains_unapproved_grant(self):
+        self.assertTrue(self.client.login(username='testuser', password="password"))
+        response = self.client.get(reverse('history-report'))
+        self.assertNotContains(response, "needs-approval")
+
+    def test_history_report_contains_approved_grant(self):
+        self.assertTrue(self.client.login(username='testuser', password="password"))
+        self.grant1.river.status.approve(as_user=self.testUser)
+        response = self.client.get(reverse('history-report'))
+        self.assertContains(response, "approved")
+        self.assertContains(response, "testuser")
+
+    def test_basic_report_csv_no_error(self):
+        self.assertTrue(self.client.login(username='testuser', password="password"))
+        response = self.client.get(reverse('basic-report'), data={"csv": True})
+        self.assertContains(response, "user1")
