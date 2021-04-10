@@ -15,6 +15,11 @@ class Group(models.Model):
 
 class User(models.Model):
     username = models.CharField(max_length=20, unique=True)
+    surname = models.CharField(max_length=20, unique=False)
+    givenname = models.CharField(max_length=20, unique=False)
+    description = models.TextField(max_length=500, unique=False)
+    externalid = models.CharField(max_length=20, unique=True)
+    expirydate = models.DateField()
 
     def __str__(self):
         return self.username
