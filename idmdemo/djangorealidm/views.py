@@ -3,9 +3,10 @@ from django.urls import reverse
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from djangorealidm.models import Grant
-from river.models import State
+from river.models import State, TransitionApproval
 from django.template import loader
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
 import csv
 
 
@@ -45,10 +46,10 @@ def reports(request):
     }
     if request.GET.get("csv"):
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
+        response['Content-Disposition'] = 'attachment; filename="basic-report.csv"'
 
         writer = csv.writer(response)
-        writer.writerow(['username', 'group', 'status', 'last_approval', 'transaction_date'])
+        writer.writerow(['username', 'group', 'role', 'status', 'last_approval', 'transaction_date'])
         for grant in grant_list:
             try:
                 approval = grant.status_transition_approvals.filter(status='approved').order_by('-id')[0]
@@ -63,3 +64,36 @@ def reports(request):
     else:
         return HttpResponse(template.render(context, request))
 
+
+@login_required(login_url='/admin/login/')
+def grant_history(request):
+    template = loader.get_template('djangorealidm/grant_history.html')
+    approvals = TransitionApproval.objects.filter(content_type=ContentType.objects.get(app_label='djangorealidm', model='grant')).filter(status="approved").order_by("-id")
+    grant_list = []
+    for approval in approvals:
+        grant_list.append({
+            "grant": Grant.objects.get(id=approval.object_id),
+            "transition": approval.transition,
+            "approver": approval.transactioner,
+            "datetime": approval.transaction_date
+        })
+    context = {
+        'grant_list': grant_list
+    }
+    if request.GET.get("csv"):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="history-report.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['username', 'group', 'role', 'status', 'approver', 'datetime'])
+        for grant in grant_list:
+            writer.writerow([
+                grant["grant"].user,
+                grant["grant"].group,
+                grant["grant"].role,
+                grant["transition"].destination_state.slug,
+                grant["approver"],
+                grant["datetime"]
+            ])
+        return response
+    else:
+        return HttpResponse(template.render(context, request))

@@ -19,14 +19,14 @@
             <td>{{grant.grant.user}}</td>
             <td>{{grant.grant.group}}</td>
             <td>{{grant.grant.role}}</td>
-            <td>{{grant.grant.status.slug}}</td>
+            <td>{{grant.transition.destination_state.slug}}</td>
             <td>{{grant.approver}}</td>
-            <td>{{grant.last_approved}}</td>
+            <td>{{grant.datetime}}</td>
         </tr>
     {% endfor %}
 </table>
 {% else %}
     <p>No data are available.</p>
 {% endif %}
-<a href="{% url 'basic-report' %}?csv=true">Download as CSV</a>
+<a href="{% url 'history-report' %}?csv=true">Download as CSV</a>
 {% endblock %}

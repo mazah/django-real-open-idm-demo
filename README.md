@@ -104,7 +104,8 @@ Create a new `On-approved hook` to sync group membership status after new approv
 Go to `http://localhost:8000/` for full list of reports available. Currently you are able to:
 
 - View a basic report about current grants
-- Export report to CSV
+- View a report about past approvals (history-report)
+- Export reports to CSV
 
 ![Report-basic](img/reports-basic.png)
 
